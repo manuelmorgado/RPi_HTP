@@ -1,0 +1,2 @@
+function HO=HO(m,x,theta)
+HO=exp(i*m.*theta-x.^2).*(2/pi)^(1/4)./realsqrt(2.^m.*factorial(m));
