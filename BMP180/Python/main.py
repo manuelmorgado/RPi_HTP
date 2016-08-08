@@ -1,7 +1,7 @@
 while True:
     choice = raw_input("> ")
-    execfile("test2.py")
-    if choice == 'b' :
+    
+    if execfile("test2.py") :
         print "You win"
         input("yay")
         break
