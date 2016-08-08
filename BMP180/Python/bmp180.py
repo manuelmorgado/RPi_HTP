@@ -1,27 +1,26 @@
-'''A Python class to access BMP180 based air pressure sensor provided
-by Switch-Science as a part no. SFE-SEN-11824.  The smbus module is
+'''A Python class to access BMP180 based air pressure sensor.  The smbus module is
 required.
 
 Example:
 
 import smbus
-#import bmp180
+import bmp180
 import sensor
 from sensor.util import Pressure, Temperature
 
 bus = smbus.SMBus(1)
 sensor = bmp180.Bmp180(bus)
-print sensor.pressure_and_temperature
-'''
+print sensor.pressure_and_temperature'''
 
+# Importing Libraries.
 import sensorbase
 import struct
 import time
 
-# Default I2C address
+# Default I2C address of BMP180.
 _DEFAULT_ADDRESS = 0x77
 
-# Registers
+# Registers.
 _REG_AC1                 = 0xAA
 _REG_AC2                 = 0xAC
 _REG_AC3                 = 0xAE
@@ -37,18 +36,18 @@ _REG_CALIB_OFFSET        = _REG_AC1
 _REG_CONTROL_MEASUREMENT = 0xF4
 _REG_DATA                = 0xF6
 
-# Commands
+# Commands for conversion, temperature and pressure.
 _CMD_START_CONVERSION    = 0b00100000
 _CMD_TEMPERATURE         = 0b00001110
 _CMD_PRESSURE            = 0b00010100
 
-# Oversampling mode
+# Oversampling mode.
 OS_MODE_SINGLE = 0b00
 OS_MODE_2      = 0b01
 OS_MODE_4      = 0b10
 OS_MODE_8      = 0b11
 
-# Conversion time (in second)
+# Conversion time (in second).
 _WAIT_TEMPERATURE = 0.0045
 _WAIT_PRESSURE    = [0.0045, 0.0075, 0.0135, 0.0255]
 
@@ -63,7 +62,6 @@ class Bmp180(sensorbase.SensorBase):
 
         self._bus = bus
         self._addr = addr
-
         self._ac0 = None
         self._ac1 = None
         self._ac2 = None
@@ -79,9 +77,10 @@ class Bmp180(sensorbase.SensorBase):
         self._os_mode = os_mode
         self._pressure = None
         self._temperature = None
-
+        
         self._read_calibration_data()
 
+    # Pressure function.
     @property
     def pressure(self):
         '''Returns a pressure value.  Returns None if no valid value is set
@@ -90,7 +89,8 @@ class Bmp180(sensorbase.SensorBase):
         '''
         self._update()
         return (self._pressure)
-
+    
+    # Temperatura function.
     @property
     def temperature(self):
         '''Returns a temperature value.  Returns None if no valid value is
@@ -98,7 +98,8 @@ class Bmp180(sensorbase.SensorBase):
         '''
         self._update()
         return (self._pressure, self._temperature)
-
+    
+    # OS mode function.
     @property
     def os_mode(self):
         '''Gets/Sets oversampling mode.
@@ -106,9 +107,7 @@ class Bmp180(sensorbase.SensorBase):
         OS_MODE_SINGLE: Single mode.
         OS_MODE_2: 2 times.
         OS_MODE_4: 4 times.
-        OS_MODE_8: 8 times.
-
-        '''
+        OS_MODE_8: 8 times.'''
         return (self._os_mode)
 
     @os_mode.setter
@@ -118,7 +117,8 @@ class Bmp180(sensorbase.SensorBase):
                or os_mode == OS_MODE_4
                or os_mode == OS_MODE_8)
         self._os_mode = os_mode
-
+    
+    # Read calibration function.
     def _read_calibration_data(self):
         while True:
                 try:
@@ -128,7 +128,7 @@ class Bmp180(sensorbase.SensorBase):
                 except IOError:
                         pass
 
-
+    # Data.
     def _update_sensor_data(self):
         cmd = _CMD_START_CONVERSION | _CMD_TEMPERATURE
         self._bus.write_byte_data(self._addr,
