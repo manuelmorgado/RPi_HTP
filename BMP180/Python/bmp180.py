@@ -117,13 +117,24 @@ class Bmp180(sensorbase.SensorBase):
                or os_mode == OS_MODE_4
                or os_mode == OS_MODE_8)
         self._os_mode = os_mode
-    
-    # Read calibration function.
+   
+    @property
+    def pressure_and_temperature(self):
+        '''Returns pressure and temperature values as a tuple.  This call can
+        save 1 transaction than getting a pressure and temperature
+        values separetely.  Returns (None, None) if no valid values
+        are set yet.
+
+        '''
+        self._update()
+        return (self._pressure, self._temperature)    
+   
+ # Read calibration function.
     def _read_calibration_data(self):
         while True:
                 try:
                         calib = self._bus.read_i2c_block_data(self._addr,_REG_CALIB_OFFSET, 22)
-                        (self._ac1, self._ac2, self._ac3, self._ac4,self._ac5, self._ac6, self._b$
+                        (self._ac1, self._ac2, self._ac3, self._ac4,self._ac5, self._ac6, self._b1, self._b2,self._mb, self._mc, self._md) = struct.unpack('>hhhHHHhhhhh', ''.join([chr(x) for x in calib]))
                         break
                 except IOError:
                         pass

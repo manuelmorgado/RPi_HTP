@@ -1,9 +1,7 @@
-while True:
-#     choice = raw_input("> ")
-    execfile("test2.py")
-    if choice = raw_input("> ") :
-        print "You win"
-        input("yay")
-        break
+key = raw_input();
 
-raw_input()
+while bool(key):
+	execfile("bmp180.py")
+
+	if bool(key) != True:
+		break
