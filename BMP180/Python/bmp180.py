@@ -1,26 +1,29 @@
-'''A Python class to access BMP180 based air pressure sensor.  The smbus module is
+''' A Python class to access BMP180 based air pressure and temperature sensor.  The smbus module is
 required.
 
 Example:
 
 import smbus
 import bmp180
+import sys, select
+import os as os
 import sensor
 from sensor.util import Pressure, Temperature
 
 bus = smbus.SMBus(1)
 sensor = bmp180.Bmp180(bus)
-print sensor.pressure_and_temperature'''
+print sensor.pressure_and_temperature '''
 
 # Importing Libraries.
 import sensorbase
 import struct
 import time
+import sys, select, os
 
 # Default I2C address of BMP180.
 _DEFAULT_ADDRESS = 0x77
 
-# Registers.
+# Registers of sensor.
 _REG_AC1                 = 0xAA
 _REG_AC2                 = 0xAC
 _REG_AC3                 = 0xAE
@@ -90,14 +93,14 @@ class Bmp180(sensorbase.SensorBase):
         self._update()
         return (self._pressure)
     
-    # Temperatura function.
+    # Temperature function.
     @property
     def temperature(self):
         '''Returns a temperature value.  Returns None if no valid value is
         set yet.
         '''
         self._update()
-        return (self._pressure, self._temperature)
+        return ( self._temperature)
     
     # OS mode function.
     @property
@@ -186,13 +189,41 @@ if __name__ == '__main__':
 
     bus = smbus.SMBus(1)
     sensor = Bmp180(bus)
-    for cache in [0, 5]:
-        print '**********'
-        print 'Cache lifetime is %d' % cache
-        sensor.cache_lifetime = cache
-        for mode in [OS_MODE_SINGLE, OS_MODE_2, OS_MODE_4, OS_MODE_8]:
-            sensor.os_mode = mode
-            print 'Oversampling mode is %d' % mode
-            for c in range(10):
-                print sensor.pressure_and_temperature
-        
+from decimal import *
+# Adquire the initial values of pressure and temperature.
+(pres_init,temp_init) = sensor.pressure_and_temperature;
+print "Initial value of temperature:",temp_init
+print "Initial value of pressure:",pres_init
+ 
+# Loop for the adquisition of temperature and pressure when the detects changes in one of them.
+while True:
+    
+    # Save the data in a tuple.
+    (pres,temp) = sensor.pressure_and_temperature;
+    #print temp_init, temp
+    
+    # Check the change of pressure and temperature.
+    (T,P) = (float(abs(Decimal(temp_init)-Decimal(temp))) , float(abs(Decimal(pres_init)-Decimal(pres))));
+    
+    # Show the temperature if it change equal or more than 0.2 Celsius degrees.    
+    if T == 0.1 or P == 0.01:
+        T = 0 ; P = 0;
+    elif T >= 0.2 or P >= 0.08:
+	T = 0 ; P = 0;
+	temp_init = temp; pres_init = pres;
+	print ("Temperature: ", temp ,"   Preassure: ", pres) 
+    time.sleep(0.1)
+
+    # End the process if you press any key + enter.
+    if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+        line = raw_input()
+        break
+
+# Measuring time of temperature and pressure function.
+from timeit import Timer
+
+prestime = Timer(lambda: sensor.pressure)
+print prestime.timeit(number=1)
+
+#temptime = Timer(lambda: sensor.temperature)
+#print temptime.timeit(number=1)
