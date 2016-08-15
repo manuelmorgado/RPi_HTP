@@ -1,4 +1,4 @@
-''' A Python class to access BMP180 based air pressure and temperature sensor.  The smbus module is
+'''A Python class to access BMP180 based air pressure and temperature sensor.  The smbus module is
 required.
 
 Example:
@@ -12,7 +12,7 @@ from sensor.util import Pressure, Temperature
 
 bus = smbus.SMBus(1)
 sensor = bmp180.Bmp180(bus)
-print sensor.pressure_and_temperature '''
+print sensor.pressure_and_temperature'''
 
 # Importing Libraries.
 import sensorbase
@@ -45,10 +45,10 @@ _CMD_TEMPERATURE         = 0b00001110
 _CMD_PRESSURE            = 0b00010100
 
 # Oversampling mode.
-OS_MODE_SINGLE = 0b00
-OS_MODE_2      = 0b01
-OS_MODE_4      = 0b10
-OS_MODE_8      = 0b11
+#OS_MODE_SINGLE = 0b00
+#OS_MODE_2      = 0b01
+#OS_MODE_4      = 0b10
+#OS_MODE_8      = 0b11
 
 # Conversion time (in second).
 _WAIT_TEMPERATURE = 0.0045
@@ -87,9 +87,7 @@ class Bmp180(sensorbase.SensorBase):
     @property
     def pressure(self):
         '''Returns a pressure value.  Returns None if no valid value is set
-        yet.
-
-        '''
+        yet.'''
         self._update()
         return (self._pressure)
     
@@ -97,8 +95,7 @@ class Bmp180(sensorbase.SensorBase):
     @property
     def temperature(self):
         '''Returns a temperature value.  Returns None if no valid value is
-        set yet.
-        '''
+        set yet.'''
         self._update()
         return ( self._temperature)
     
@@ -106,7 +103,6 @@ class Bmp180(sensorbase.SensorBase):
     @property
     def os_mode(self):
         '''Gets/Sets oversampling mode.
-
         OS_MODE_SINGLE: Single mode.
         OS_MODE_2: 2 times.
         OS_MODE_4: 4 times.
@@ -126,9 +122,7 @@ class Bmp180(sensorbase.SensorBase):
         '''Returns pressure and temperature values as a tuple.  This call can
         save 1 transaction than getting a pressure and temperature
         values separetely.  Returns (None, None) if no valid values
-        are set yet.
-
-        '''
+        are set yet.'''
         self._update()
         return (self._pressure, self._temperature)    
    
@@ -185,11 +179,13 @@ class Bmp180(sensorbase.SensorBase):
         self._pressure = (p + ((x1 + x2 + 3791) >> 4)) / 100.0
 
 if __name__ == '__main__':
+    
     import smbus
-
+    from decimal import *
+    
     bus = smbus.SMBus(1)
     sensor = Bmp180(bus)
-from decimal import *
+
 # Adquire the initial values of pressure and temperature.
 (pres_init,temp_init) = sensor.pressure_and_temperature;
 print "Initial value of temperature:",temp_init
@@ -209,9 +205,10 @@ while True:
     if T == 0.1 or P == 0.01:
         T = 0 ; P = 0;
     elif T >= 0.2 or P >= 0.08:
-	T = 0 ; P = 0;
-	temp_init = temp; pres_init = pres;
+	    T = 0 ; P = 0;
+	    temp_init = temp; pres_init = pres;
 	print ("Temperature: ", temp ,"   Preassure: ", pres) 
+    
     time.sleep(0.1)
 
     # End the process if you press any key + enter.
