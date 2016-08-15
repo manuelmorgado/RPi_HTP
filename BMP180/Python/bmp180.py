@@ -80,7 +80,6 @@ class Bmp180(sensorbase.SensorBase):
         self._os_mode = os_mode
         self._pressure = None
         self._temperature = None
-        
         self._read_calibration_data()
 
     # Pressure function.
@@ -90,7 +89,7 @@ class Bmp180(sensorbase.SensorBase):
         yet.'''
         self._update()
         return (self._pressure)
-    
+
     # Temperature function.
     @property
     def temperature(self):
@@ -98,7 +97,7 @@ class Bmp180(sensorbase.SensorBase):
         set yet.'''
         self._update()
         return ( self._temperature)
-    
+
     # OS mode function.
     @property
     def os_mode(self):
@@ -116,7 +115,7 @@ class Bmp180(sensorbase.SensorBase):
                or os_mode == OS_MODE_4
                or os_mode == OS_MODE_8)
         self._os_mode = os_mode
-   
+
     @property
     def pressure_and_temperature(self):
         '''Returns pressure and temperature values as a tuple.  This call can
@@ -125,7 +124,7 @@ class Bmp180(sensorbase.SensorBase):
         are set yet.'''
         self._update()
         return (self._pressure, self._temperature)    
-   
+
  # Read calibration function.
     def _read_calibration_data(self):
         while True:
@@ -179,10 +178,10 @@ class Bmp180(sensorbase.SensorBase):
         self._pressure = (p + ((x1 + x2 + 3791) >> 4)) / 100.0
 
 if __name__ == '__main__':
-    
+
     import smbus
     from decimal import *
-    
+
     bus = smbus.SMBus(1)
     sensor = Bmp180(bus)
 
@@ -193,22 +192,22 @@ print "Initial value of pressure:",pres_init
  
 # Loop for the adquisition of temperature and pressure when the detects changes in one of them.
 while True:
-    
+
     # Save the data in a tuple.
     (pres,temp) = sensor.pressure_and_temperature;
     #print temp_init, temp
-    
+
     # Check the change of pressure and temperature.
     (T,P) = (float(abs(Decimal(temp_init)-Decimal(temp))) , float(abs(Decimal(pres_init)-Decimal(pres))));
-    
+
     # Show the temperature if it change equal or more than 0.2 Celsius degrees.    
     if T == 0.1 or P == 0.01:
         T = 0 ; P = 0;
     elif T >= 0.2 or P >= 0.08:
-	    T = 0 ; P = 0;
-	    temp_init = temp; pres_init = pres;
-	print ("Temperature: ", temp ,"   Preassure: ", pres) 
-    
+        T = 0 ; P = 0;
+        temp_init = temp; pres_init = pres;
+    print ("Temperature: ", temp ,"   Preassure: ", pres) 
+
     time.sleep(0.1)
 
     # End the process if you press any key + enter.
