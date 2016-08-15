@@ -45,7 +45,7 @@ _CMD_TEMPERATURE         = 0b00001110
 _CMD_PRESSURE            = 0b00010100
 
 # Oversampling mode.
-#OS_MODE_SINGLE = 0b00
+OS_MODE_SINGLE = 0b00
 #OS_MODE_2      = 0b01
 #OS_MODE_4      = 0b10
 #OS_MODE_8      = 0b11
