@@ -1,4 +1,4 @@
-'''A Python class to access BMP180 based air pressure and temperature sensor.  The smbus module is
+'''A Python class to access bmp180 based air pressure and temperature sensor.  The smbus module is
 required.
 
 Example:
@@ -11,7 +11,7 @@ import sensor
 from sensor.util import Pressure, Temperature
 
 bus = smbus.SMBus(1)
-sensor = bmp180.Bmp180(bus)
+sensor = bmp180.bmp180(bus)
 print sensor.pressure_and_temperature'''
 
 # Importing Libraries.
@@ -20,7 +20,7 @@ import struct
 import time
 import sys, select, os
 
-# Default I2C address of BMP180.
+# Default I2C address of bmp180.
 _DEFAULT_ADDRESS = 0x77
 
 # Registers of sensor.
@@ -54,14 +54,14 @@ OS_MODE_SINGLE = 0b00
 _WAIT_TEMPERATURE = 0.0045
 _WAIT_PRESSURE    = [0.0045, 0.0075, 0.0135, 0.0255]
 
-class Bmp180(sensorbase.SensorBase):
+class bmp180(sensorbase.SensorBase):
     def __init__(self, bus = None, addr = _DEFAULT_ADDRESS,
                  os_mode = OS_MODE_SINGLE):
         assert(bus is not None)
         assert(addr > 0b000111
                and addr < 0b1111000)
 
-        super(Bmp180, self).__init__(update_callback = self._update_sensor_data)
+        super(bmp180, self).__init__(update_callback = self._update_sensor_data)
 
         self._bus = bus
         self._addr = addr
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     from decimal import *
 
     bus = smbus.SMBus(1)
-    sensor = Bmp180(bus)
+    sensor = bmp180(bus)
 
 # Adquire the initial values of pressure and temperature.
 (pres_init,temp_init) = sensor.pressure_and_temperature;
