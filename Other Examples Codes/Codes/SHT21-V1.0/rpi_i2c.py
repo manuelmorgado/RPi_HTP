@@ -27,11 +27,11 @@ class I2C:
     """
     addr = 0x40
     dev = None
-    gpio_scl = 3
-    gpio_sda = 2
+    gpio_scl = 9
+    gpio_sda = 8
     delay = 0.001
 
-    def open(self,addr=0, dev=1, scl=0, sda=0):
+    def open(self,addr=0x40, dev=1, scl=3, sda=2):
         """Open I2C-Port
 
         addr: I2C-Device Address

@@ -45,7 +45,7 @@ class sht21:
     def open(self, dev=1, scl=3, sda=2):
         """Hardware I2C Port, B,B+,Pi 2 = 1 the first Pi = 0"""
         self.i2c.open(0x40,dev, scl, sda)
-        self.i2c.write([0x40])#[0xFE])  # execute Softreset Command  (default T=14Bit RH=12)
+        self.i2c.write([0xFE])  # execute Softreset Command  (default T=14Bit RH=12)
         time.sleep(0.050)
 
     def read_temperature(self):
@@ -89,21 +89,21 @@ class sht21:
                     crc = (crc << 1)
         return True if (crc == data[length]) else False
 
-while True:
-	sensor = sht21()
-	sensor.open()
-	temp = sensor.read_temperature()
-	print temp
-#if __name__ == "__main__":
-    #SHT21 = sht21()
-    #while True:
-        #try:
+#while True:
+	#sensor = sht21()
+	#sensor.open()
+	#temp = sensor.measure
+	#print temp
+if __name__ == "__main__":
+    SHT21 = sht21()
+    while True:
+        try:
             ############################################################################################################
             # Example 1 Using the I2C Driver
             ############################################################################################################
 
-            #(temperature, humidity) = SHT21.measure(1)      # I2C-1 Port
-            #print("Temperature: %s °C  Humidity: %s %%" % (temperature, humidity))
+            (temperature, humidity) = SHT21.measure(1)      # I2C-1 Port
+            print("Temperature: %s °C  Humidity: %s %%" % (temperature, humidity))
 
             ############################################################################################################
             # Example 2 Using GPIOs on I2C Pins (without Driver), must be executed with sudo
@@ -121,6 +121,6 @@ while True:
             #print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
 
             ############################################################################################################
-        #except:
-            #print("sht21 I/O Error")
-        #time.sleep(0.2)
+        except:
+            print("sht21 I/O Error")
+        time.sleep(0.2)
