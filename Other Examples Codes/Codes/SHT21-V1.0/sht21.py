@@ -88,11 +88,11 @@ class sht21:
                 else:
                     crc = (crc << 1)
         return True if (crc == data[length]) else False
-i=1
+
 while True:
 	sensor = sht21()
-	sensor.open
-	temp = sensor.read_temperature
+	sensor.open()
+	temp = sensor.read_temperature()
 	print temp
 #if __name__ == "__main__":
     #SHT21 = sht21()
