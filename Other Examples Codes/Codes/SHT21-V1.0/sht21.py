@@ -45,7 +45,7 @@ class sht21:
     def open(self, dev=1, scl=3, sda=2):
         """Hardware I2C Port, B,B+,Pi 2 = 1 the first Pi = 0"""
         self.i2c.open(0x40,dev, scl, sda)
-        self.i2c.write([0xFE])  # execute Softreset Command  (default T=14Bit RH=12)
+        self.i2c.write([0x40])#[0xFE])  # execute Softreset Command  (default T=14Bit RH=12)
         time.sleep(0.050)
 
     def read_temperature(self):
