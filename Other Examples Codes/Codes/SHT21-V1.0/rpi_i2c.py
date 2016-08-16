@@ -25,10 +25,10 @@ class I2C:
 
     Open the "internal" I2C Port with driver or emulate an I2C Bus on GPIO
     """
-    addr = 0
+    addr = 0x40
     dev = None
-    gpio_scl = 0
-    gpio_sda = 0
+    gpio_scl = 3
+    gpio_sda = 2
     delay = 0.001
 
     def open(self,addr=0, dev=1, scl=0, sda=0):

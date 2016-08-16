@@ -33,8 +33,7 @@ class sht21:
     """
 
     i2c = rpi_i2c.I2C()     # I2C Wrapper Class
-    print i2c
-
+    
     def measure(self, dev=1, scl=3, sda=2):
         """Complete cycle including open, measurement und close, return tuple of temperature and humidity"""
         self.open(dev, scl, sda)
@@ -52,7 +51,7 @@ class sht21:
     def read_temperature(self):
         """ Temperature measurement (no hold master), blocking for ~ 88ms !!! """
         self.i2c.write([0xF3])
-        time.sleep(0.086)  # wait, typ=66ms, max=85ms @ 14Bit resolution
+        time.sleep(0.036)  # wait, typ=66ms, max=85ms @ 14Bit resolution
         data = self.i2c.read(3)
         if (self._check_crc(data, 2)):
             t = ((data[0] << 8) + data[1]) & 0xFFFC  # set status bits to zero
@@ -89,14 +88,16 @@ class sht21:
                 else:
                     crc = (crc << 1)
         return True if (crc == data[length]) else False
-
-
-if __name__ == "__main__":
-    SHT21 = sht21()
-    print("sht21 Demo by www.emsystech.de")
-    print SHT21
-    while True:
-        try:
+i=1
+while True:
+	sensor = sht21()
+	sensor.open
+	temp = sensor.read_temperature
+	print temp
+#if __name__ == "__main__":
+    #SHT21 = sht21()
+    #while True:
+        #try:
             ############################################################################################################
             # Example 1 Using the I2C Driver
             ############################################################################################################
@@ -115,11 +116,11 @@ if __name__ == "__main__":
             # Example 3 Using multiple Sensors (without Driver), must be executed with sudo, Pullups required
             ############################################################################################################
 
-            (t0, rh0) = SHT21.measure(None,25,8)  # Use GPIOs SCL=3, SDA=2
-            (t1, rh1) = SHT21.measure(None,7,11)  # Use GPIOs SCL=3, SDA=2
-            print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
+            #(t0, rh0) = SHT21.measure(None,25,8)  # Use GPIOs SCL=3, SDA=2
+            #(t1, rh1) = SHT21.measure(None,7,11)  # Use GPIOs SCL=3, SDA=2
+            #print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
 
             ############################################################################################################
-        except:
-            print("sht21 I/O Error")
-        time.sleep(2)
+        #except:
+            #print("sht21 I/O Error")
+        #time.sleep(0.2)
