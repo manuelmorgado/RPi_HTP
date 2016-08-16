@@ -46,6 +46,7 @@ class SHT21:
     """
 
     i2c = rpi_i2c.I2C()     # I2C Wrapper Class
+    print i2c
 
     def measure(self, dev=1, scl=3, sda=2):
         """Complete cycle including open, measurement und close, return tuple of temperature and humidity"""
@@ -106,14 +107,15 @@ class SHT21:
 if __name__ == "__main__":
     sht21 = SHT21()
     print("SHT21 Demo by www.emsystech.de")
+    print sht21
     while True:
         try:
             ############################################################################################################
             # Example 1 Using the I2C Driver
             ############################################################################################################
 
-            (temperature, humidity) = sht21.measure(1)      # I2C-1 Port
-            print("Temperature: %s °C  Humidity: %s %%" % (temperature, humidity))
+            #(temperature, humidity) = sht21.measure(1)      # I2C-1 Port
+            #print("Temperature: %s °C  Humidity: %s %%" % (temperature, humidity))
 
             ############################################################################################################
             # Example 2 Using GPIOs on I2C Pins (without Driver), must be executed with sudo
@@ -126,9 +128,9 @@ if __name__ == "__main__":
             # Example 3 Using multiple Sensors (without Driver), must be executed with sudo, Pullups required
             ############################################################################################################
 
-            #(t0, rh0) = sht21.measure(None,25,8)  # Use GPIOs SCL=3, SDA=2
-            #(t1, rh1) = sht21.measure(None,7,11)  # Use GPIOs SCL=3, SDA=2
-            #print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
+            (t0, rh0) = sht21.measure(None,25,8)  # Use GPIOs SCL=3, SDA=2
+            (t1, rh1) = sht21.measure(None,7,11)  # Use GPIOs SCL=3, SDA=2
+            print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
 
             ############################################################################################################
         except:
