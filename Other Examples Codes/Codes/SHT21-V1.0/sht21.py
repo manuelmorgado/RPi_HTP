@@ -1,28 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-# Copyright (c) 2015 Martin Steppuhn, www.emsystech.de. All rights reserved.
-#
-# Redistribution and use in source and binary, must retain the above copyright notice, and the following disclaimer.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-# THE POSSIBILITY OF SUCH DAMAGE.
-#
-# History:
-# 24.06.2015    Martin Steppuhn     Initial version
-
+#Importing Lybraries
 import time
 import rpi_i2c
 
-class SHT21:
-    """Interface Class for SHT21 Temperture and Humidity Sensor from www.sensirion.com
+#Creating the class sht21
+class sht21:
+    """Interface Class for sht21 Temperture and Humidity Sensor from www.sensirion.com
 
-    Hardware: Breakoutboard with SHT21 Sensor for Raspberry Pi by www.emsystech.de
+    Hardware: Breakoutboard with sht21 Sensor for Raspberry Pi by www.emsystech.de
 
     The Class can be used in two ways.
     1. With the build in I2C Port from Raspberry Pi using I2C Driver
@@ -33,16 +20,16 @@ class SHT21:
 
     The method "measure" does a complete cycle and returns a tupple with the values:
 
-    (temperature, humidity) = sht21.measure(1)      # I2C-1 Port
+    (temperature, humidity) = SHT21.measure(1)      # I2C-1 Port
 
     If you want it more flexible e.g. multiple measurements, only humidity or temperature use:
 
-    sht21.open(1)
+    SHT21.open(1)
     ...
-    temperature = sht21.read_temperature()
-    humidity = sht21.read_humidity()
+    temperature = SHT21.read_temperature()
+    humidity = SHT21.read_humidity()
     ...
-    sht21.close()
+    SHT21.close()
     """
 
     i2c = rpi_i2c.I2C()     # I2C Wrapper Class
@@ -105,34 +92,34 @@ class SHT21:
 
 
 if __name__ == "__main__":
-    sht21 = SHT21()
-    print("SHT21 Demo by www.emsystech.de")
-    print sht21
+    SHT21 = sht21()
+    print("sht21 Demo by www.emsystech.de")
+    print SHT21
     while True:
         try:
             ############################################################################################################
             # Example 1 Using the I2C Driver
             ############################################################################################################
 
-            #(temperature, humidity) = sht21.measure(1)      # I2C-1 Port
+            #(temperature, humidity) = SHT21.measure(1)      # I2C-1 Port
             #print("Temperature: %s °C  Humidity: %s %%" % (temperature, humidity))
 
             ############################################################################################################
             # Example 2 Using GPIOs on I2C Pins (without Driver), must be executed with sudo
             ############################################################################################################
 
-            #(temperature, humidity) = sht21.measure(None)   # No I2C-Port/Driver --> GPIO2, GPIO3
+            #(temperature, humidity) = SHT21.measure(None)   # No I2C-Port/Driver --> GPIO2, GPIO3
             #print("Temperature: %s °C  Humidity: %s %%" % (temperature, humidity))
 
             ############################################################################################################
             # Example 3 Using multiple Sensors (without Driver), must be executed with sudo, Pullups required
             ############################################################################################################
 
-            (t0, rh0) = sht21.measure(None,25,8)  # Use GPIOs SCL=3, SDA=2
-            (t1, rh1) = sht21.measure(None,7,11)  # Use GPIOs SCL=3, SDA=2
+            (t0, rh0) = SHT21.measure(None,25,8)  # Use GPIOs SCL=3, SDA=2
+            (t1, rh1) = SHT21.measure(None,7,11)  # Use GPIOs SCL=3, SDA=2
             print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
 
             ############################################################################################################
         except:
-            print("SHT21 I/O Error")
+            print("sht21 I/O Error")
         time.sleep(2)
