@@ -22,9 +22,7 @@ import time
 
 class I2C:
     """Wrapper class for I2C with raspberry Pi
-
-    Open the "internal" I2C Port with driver or emulate an I2C Bus on GPIO
-    """
+    Open the "internal" I2C Port with driver or emulate an I2C Bus on GPIO"""
     addr = 0x40
     dev = None
     gpio_scl = 9
@@ -33,13 +31,12 @@ class I2C:
 
     def open(self,addr=0x40, dev=1, scl=3, sda=2):
         """Open I2C-Port
-
         addr: I2C-Device Address
         dev:  I2C-Port (Raspberry Pi) B,B+,Pi 2 = 1 the first Pi = 0
               For I2C Emulation with GPIO, dev must be None
         scl:  GPIO-Pin for SCL
-        sda:  GPIO-Pin for SDA
-        """
+        sda:  GPIO-Pin for SDA """
+
         self.addr = addr
         self.dev = dev
         self.gpio_scl = scl
@@ -63,9 +60,8 @@ class I2C:
 
     def write(self, data):
         """Write data to device
+        :param data: one ore more bytes (int list) """
 
-        :param data: one ore more bytes (int list)
-        """
         if (self.dev == None):
             self._i2c_gpio_start()
             ack = self._i2c_gpio_write_byte(self.addr << 1)
@@ -77,15 +73,15 @@ class I2C:
 
     def read(self, size):
         """Read Bytes from I2C Device
-
         :param size: Number of Bytes to read
-        :return: List with bytes
-        """
+        :return: List with bytes"""
+
         data = dict()
         if (self.dev == None):
             self._i2c_gpio_start()
             ack = self._i2c_gpio_write_byte((self.addr << 1) + 1)  # set READ-BIT
             # if not ack: print("I2C-ERROR: READ,NACK1")
+
             for i in range(size):
                 ack = True if ((i + 1) < size) else False
                 data[i] = self._i2c_gpio_read_byte(ack)
@@ -102,6 +98,7 @@ class I2C:
 
     def _i2c_gpio_start(self):
         """Send Start"""
+
         GPIO.setup(self.gpio_scl, GPIO.IN)  # SCL=1
         GPIO.setup(self.gpio_sda, GPIO.IN)  # SDA=1
         time.sleep(2 * self.delay)
@@ -113,6 +110,7 @@ class I2C:
 
     def _i2c_gpio_stop(self):
         """Send Stop"""
+
         GPIO.setup(self.gpio_sda, GPIO.OUT)  # SDA=0
         GPIO.output(self.gpio_sda, 0)
         time.sleep(2 * self.delay)
@@ -123,6 +121,7 @@ class I2C:
 
     def _i2c_gpio_write_byte(self, data):
         """Write a single byte"""
+
         for i in range(8):  # stop
             if (data & 0x80):
                 GPIO.setup(self.gpio_sda, GPIO.IN)  # SDA=1
@@ -133,6 +132,7 @@ class I2C:
             time.sleep(self.delay)
             GPIO.setup(self.gpio_scl, GPIO.IN)  # SCL=1
             time.sleep(self.delay)
+
             # Clockstretching ToDo
             GPIO.setup(self.gpio_scl, GPIO.OUT)  # SCL=0
             GPIO.output(self.gpio_scl, 0)
@@ -142,7 +142,8 @@ class I2C:
         time.sleep(self.delay)
         GPIO.setup(self.gpio_scl, GPIO.IN)  # SCL=1
         time.sleep(self.delay)
-        # Clockstretching ToDo
+        
+	# Clockstretching ToDo
         ack = True if (GPIO.input(self.gpio_sda) == 0) else False
         GPIO.setup(self.gpio_scl, GPIO.OUT)  # SCL=0
         GPIO.output(self.gpio_scl, 0)
@@ -156,7 +157,8 @@ class I2C:
             time.sleep(self.delay)
             GPIO.setup(self.gpio_scl, GPIO.IN)  # SCL=1
             time.sleep(self.delay)
-            # Clockstretching ToDo
+            
+	    # Clockstretching ToDo
             data = data << 1
             if (GPIO.input(self.gpio_sda)):
                 data |= 1
@@ -175,7 +177,8 @@ class I2C:
         time.sleep(self.delay)
         GPIO.setup(self.gpio_scl, GPIO.IN)  # SCL=1
         time.sleep(self.delay)
-        # Clockstretching ToDo
+        
+	# Clockstretching ToDo
         GPIO.setup(self.gpio_scl, GPIO.OUT)  # SCL=0
         GPIO.output(self.gpio_scl, 0)
         time.sleep(self.delay)
