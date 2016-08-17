@@ -1,3 +1,0 @@
-function loss=loss(m,k,eta)
-
-            loss=realsqrt(factorial(m+k)./factorial(k)./factorial(m).*eta.^(m).*(1-eta).^k);        

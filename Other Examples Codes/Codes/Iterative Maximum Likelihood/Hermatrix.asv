@@ -1,7 +1,0 @@
-function Hermatrix=Hermatrix(n_max)= 20;
-Hermatrix=zeros(n_max+1,n_max+1);
-for j=0:n_max
-    Hermatrix(j+1,n_max-j+1:n_max+1)=HermitePoly(j);
-end;
-Hermatrix=Hermatrix';
-save Hmatrix Hermatrix
