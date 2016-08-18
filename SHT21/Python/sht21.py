@@ -76,14 +76,14 @@ if __name__ == "__main__":
         try:
             
             #Method 1
-            (t , rh) = SHT21.measure(None,3,2)
-            print t, rh
+            #(t , rh) = SHT21.measure(None,3,2)
+            #print t, rh
             
             #Method 2
             (temperature, humidity) = SHT21.measure(None)   # No I2C-Port/Driver --> GPIO2, GPIO3
             print("Temperature: %s   C  Humidity: %s %%" % (temperature, humidity))
         
-            time.sleep(0.1)	
+            time.sleep(0.2)	
 
         except:
             print("sht21 I/O Error")
