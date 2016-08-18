@@ -87,3 +87,5 @@ if __name__ == "__main__":
 
         except:
             print("sht21 I/O Error")
+
+time.sleep(0.2)	

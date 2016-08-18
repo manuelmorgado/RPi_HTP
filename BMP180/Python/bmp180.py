@@ -14,16 +14,16 @@ bus = smbus.SMBus(1)
 sensor = bmp180.bmp180(bus)
 print sensor.pressure_and_temperature'''
 
-# Importing Libraries.
+# Importing libraries
 import sensorbase
 import struct
 import time
 import sys, select, os
 
-# Default I2C address of bmp180.
+# Default I2C address of bmp180
 _DEFAULT_ADDRESS = 0x77
 
-# Registers of sensor.
+# Registers of sensor
 _REG_AC1                 = 0xAA
 _REG_AC2                 = 0xAC
 _REG_AC3                 = 0xAE
@@ -39,30 +39,35 @@ _REG_CALIB_OFFSET        = _REG_AC1
 _REG_CONTROL_MEASUREMENT = 0xF4
 _REG_DATA                = 0xF6
 
-# Commands for conversion, temperature and pressure.
+# Commands for conversion, temperature and pressure
 _CMD_START_CONVERSION    = 0b00100000
 _CMD_TEMPERATURE         = 0b00001110
 _CMD_PRESSURE            = 0b00010100
 
-# Oversampling mode.
+# Oversampling mode (Affects the time of the measurament also the precision)
 OS_MODE_SINGLE = 0b00
 #OS_MODE_2      = 0b01
 #OS_MODE_4      = 0b10
 #OS_MODE_8      = 0b11
 
-# Conversion time (in second).
+# Conversion time (in second)
 _WAIT_TEMPERATURE = 0.0045
 _WAIT_PRESSURE    = [0.0045, 0.0075, 0.0135, 0.0255]
 
+# Define the Class of the sensor BMP180
 class bmp180(sensorbase.SensorBase):
+    
+# Initialise the sensor
     def __init__(self, bus = None, addr = _DEFAULT_ADDRESS,
                  os_mode = OS_MODE_SINGLE):
+        # Define the commands for measure the temperature or the pressure
         assert(bus is not None)
         assert(addr > 0b000111
                and addr < 0b1111000)
 
         super(bmp180, self).__init__(update_callback = self._update_sensor_data)
 
+        # Define the coefficients of the calibrations
         self._bus = bus
         self._addr = addr
         self._ac0 = None
@@ -82,7 +87,7 @@ class bmp180(sensorbase.SensorBase):
         self._temperature = None
         self._read_calibration_data()
 
-    # Pressure function.
+    # Pressure function
     @property
     def pressure(self):
         '''Returns a pressure value.  Returns None if no valid value is set
@@ -90,7 +95,7 @@ class bmp180(sensorbase.SensorBase):
         self._update()
         return (self._pressure)
 
-    # Temperature function.
+    # Temperature function
     @property
     def temperature(self):
         '''Returns a temperature value.  Returns None if no valid value is
@@ -98,7 +103,7 @@ class bmp180(sensorbase.SensorBase):
         self._update()
         return ( self._temperature)
 
-    # OS mode function.
+    # OS mode function
     @property
     def os_mode(self):
         '''Gets/Sets oversampling mode.
@@ -109,6 +114,7 @@ class bmp180(sensorbase.SensorBase):
         return (self._os_mode)
 
     @os_mode.setter
+    # Set oversampling mode
     def os_mode(self, os_mode):
         assert(os_mode == OS_MODE_SINGLE
                or os_mode == OS_MODE_2
@@ -117,6 +123,7 @@ class bmp180(sensorbase.SensorBase):
         self._os_mode = os_mode
 
     @property
+    # Pressure and temperature function
     def pressure_and_temperature(self):
         '''Returns pressure and temperature values as a tuple.  This call can
         save 1 transaction than getting a pressure and temperature
@@ -125,7 +132,7 @@ class bmp180(sensorbase.SensorBase):
         self._update()
         return (self._pressure, self._temperature)    
 
- # Read calibration function.
+    # Read Calibration function
     def _read_calibration_data(self):
         while True:
                 try:
@@ -135,8 +142,10 @@ class bmp180(sensorbase.SensorBase):
                 except IOError:
                         pass
 
-    # Data.
+    # Data
     def _update_sensor_data(self):
+
+        # Read uncompensated temperature value
         cmd = _CMD_START_CONVERSION | _CMD_TEMPERATURE
         self._bus.write_byte_data(self._addr,
                                   _REG_CONTROL_MEASUREMENT, cmd)
@@ -145,6 +154,7 @@ class bmp180(sensorbase.SensorBase):
                                              _REG_DATA, 2)
         ut = vals[0] << 8 | vals[1]
 
+        # Read uncompensated pressure value
         cmd = _CMD_START_CONVERSION | self._os_mode << 6 | _CMD_PRESSURE
         self._bus.write_byte_data(self._addr,
                                   _REG_CONTROL_MEASUREMENT, cmd)
@@ -153,11 +163,13 @@ class bmp180(sensorbase.SensorBase):
                                              _REG_DATA, 3)
         up = (vals[0] << 16 | vals[1] << 8 | vals[0]) >> (8 - self._os_mode)
 
+        # Calculating the true temperature
         x1 = ((ut - self._ac6) * self._ac5) >> 15
         x2 = (self._mc << 11) / (x1 + self._md)
         b5 = x1 + x2
         self._temperature = ((b5 + 8) / 2**4) / 10.0
 
+        # Calculating the true temperature
         b6 = b5 - 4000
         x1 = self._b2 * ((b6 * b6) >> 12)
         x2 = self._ac2 * b6
