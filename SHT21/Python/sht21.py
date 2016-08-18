@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-# Importing Lybraries
+# Importing libraries
 import time
 import rpi_i2c
 
