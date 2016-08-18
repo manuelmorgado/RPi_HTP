@@ -102,8 +102,8 @@ if __name__ == "__main__":
             # Example 1 Using the I2C Driver
             ############################################################################################################
 
-            (temperature, humidity) = SHT21.measure(1)      # I2C-1 Port
-            print("Temperature: %s °C  Humidity: %s %%" % (temperature, humidity))
+            #(temperature, humidity) = SHT21.measure(1)      # I2C-1 Port
+            #print("Temperature: %s °C  Humidity: %s %%" % (temperature, humidity))
 
             ############################################################################################################
             # Example 2 Using GPIOs on I2C Pins (without Driver), must be executed with sudo
@@ -119,8 +119,14 @@ if __name__ == "__main__":
             #(t0, rh0) = SHT21.measure(None,25,8)  # Use GPIOs SCL=3, SDA=2
             #(t1, rh1) = SHT21.measure(None,7,11)  # Use GPIOs SCL=3, SDA=2
             #print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
-
-            ############################################################################################################
+	    (t0 , rh0) = SHT21.measure(None,3,2)
+	    time.sleep(0.06)	
+	    (t1 , rh1) = SHT21.measure(None, 3,2)
+	    #print ("%s C&C\tC\t%s%%\t%s  C\t%s%%" % (t0,rh0,t1,rh1))
+	    t3 = SHT21.read_temperature()
+	    print t3            
+ 	    print t0, rh0, t1, rh1
+	    ############################################################################################################
         except:
             print("sht21 I/O Error")
         time.sleep(0.2)
