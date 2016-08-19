@@ -86,12 +86,11 @@ with open(www_path+"/"+json_file, "w") as fp:
     fp.write(json)
 
 # build charts if necessary
-min = int(time.time() / 60)
 
+min = int(time.time() / 60)
 # build day chart every 10 minutes or if not exist
 if not (os.path.isfile(www_path+"/chart-day.png")) or ((min % 10) == 0):
     rrd_graph(1*24*60*60,"chart-day.png")
-    
     # build week chart every hour or if not exist
     if not (os.path.isfile(www_path+"/chart-week.png")) or ((min % 60) == 0):
         rrd_graph(7*24*60*60,"chart-week.png")
