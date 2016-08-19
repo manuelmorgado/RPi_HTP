@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# Importing libraries
 import sht21
 import time
 import datetime
