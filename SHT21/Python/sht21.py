@@ -74,6 +74,11 @@ if __name__ == "__main__":
     SHT21 = sht21()
     while True:
         try:
+
+            # End the process if you press any key + enter.
+            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                line = raw_input()
+                break
             
             #Method 1
             #(t , rh) = SHT21.measure(None,3,2)
@@ -88,4 +93,4 @@ if __name__ == "__main__":
         except:
             print("sht21 I/O Error")
 
-time.sleep(0.2)	
+time.sleep(0.2)	 
