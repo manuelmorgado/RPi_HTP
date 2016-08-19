@@ -4,7 +4,7 @@ import time
 # Define Class SensorBase
 class SensorBase(object):
 
-# Initialise the sensor
+    # Initialise the sensor
     def __init__(self, update_callback):
         assert (update_callback is not None)
 
@@ -12,7 +12,7 @@ class SensorBase(object):
         self._last_updated = None
         self._update_callback = update_callback
 
-# Update the state of the sensor
+    # Update the state of the sensor
     def _update(self, **kwargs):
         now = time.time()
 
@@ -20,8 +20,7 @@ class SensorBase(object):
         if self._cache_lifetime > 0:
         
             # Check if the cached value is still valid or not
-            if (self._last_updated is not None
-                and self._last_updated + self._cache_lifetime > now):
+            if (self._last_updated is not None and self._last_updated + self._cache_lifetime > now):
                 # The value is still valid.
                 return
 
@@ -31,7 +30,6 @@ class SensorBase(object):
             self._last_updated = now
         except:
             raise
-
         return
 
     @property
