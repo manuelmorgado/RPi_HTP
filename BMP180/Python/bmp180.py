@@ -132,7 +132,16 @@ class bmp180(sensorbase.SensorBase):
         self._update()
         return (self._pressure, self._temperature)    
 
-    # Read Calibration function
+#     Read Calibration function
+#     def _read_calibration_data(self):
+#         while True:
+#                 try:
+#                         calib = self._bus.read_i2c_block_data(self._addr,_REG_CALIB_OFFSET, 22)
+#                         (self._ac1, self._ac2, self._ac3, self._ac4,self._ac5, self._ac6, self._b1, self._b2,self._mb, self._mc, self._md) = struct.unpack('>hhhHHHhhhhh', ''.join([chr(x) for x in calib]))
+#                         break
+#                 except IOError:
+#                         pass
+ # Read calibration function.
     def _read_calibration_data(self):
         while True:
                 try:
@@ -141,7 +150,6 @@ class bmp180(sensorbase.SensorBase):
                         break
                 except IOError:
                         pass
-
     # Data
     def _update_sensor_data(self):
 
