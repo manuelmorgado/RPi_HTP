@@ -4,7 +4,7 @@
 # Importing libraries
 import time
 import rpi_i2c
-
+import sys, select, os
 
 
 # Creating the class sht21
@@ -75,15 +75,21 @@ if __name__ == "__main__":
     while True:
         try:
             
+	    # End the process if you press any key + enter.
+            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                line = raw_input()
+                break
+
             #Method 1
-            #(t , rh) = SHT21.measure(None,3,2)
-            #print t, rh
+            (t , rh) = SHT21.measure(None,3,2)
+            print t, rh
             
             #Method 2
-            (temperature, humidity) = SHT21.measure(None)   # No I2C-Port/Driver --> GPIO2, GPIO3
-            print("Temperature: %s   C  Humidity: %s %%" % (temperature, humidity))
+            #(temperature, humidity) = SHT21.measure(None)   # No I2C-Port/Driver --> GPIO2, GPIO3
+            #print("Temperature: %s   C  Humidity: %s %%" % (temperature, humidity))
         
-            time.sleep(0.2)	
+            time.sleep(0.1)	
+	    # End the process if you press any key + enter
 
         except:
             print("sht21 I/O Error")
