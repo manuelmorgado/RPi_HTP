@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+# Importing libraries
 import os
 
 def get_temperature():

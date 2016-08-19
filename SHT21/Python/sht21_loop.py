@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+# Importing libraries
 import sht21
 import time
 import datetime
@@ -7,11 +8,15 @@ import datetime
 
 sht21 = sht21.SHT21()
 
-interval = 5  # Intervall for measurement
-file = "log_loop.txt"  # File for Datastorage
+# Intervall for measurement
+interval = 5  
 
-print("SHT21-Demo: Write measurement data every", interval, "seconds to", file)
+# File for Datastorage
+file = "log_loop.txt"  
 
+print("SHT21: Write measurement data every", interval, "seconds to", file)
+
+# Getting data and measuring
 while 1:
     if ((int(time.time()) % interval) == 0):
         try:
