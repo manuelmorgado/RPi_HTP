@@ -95,7 +95,7 @@ OS_MODE_8      = 0b11
 _WAIT_TEMPERATURE = 0.0045
 _WAIT_PRESSURE    = [0.0045, 0.0075, 0.0135, 0.0255]
 
-class Bmp180(sensorbase.SensorBase):
+class Bmp180(sensorbaseC.SensorBase):
     def __init__(self, bus = None, addr = _DEFAULT_ADDRESS,
                  os_mode = OS_MODE_SINGLE):
         assert(bus is not None)
