@@ -75,23 +75,10 @@ if __name__ == "__main__":
     while True:
         try:
 
-            # End the process if you press any key + enter.
-            #if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-                #line = raw_input()
-                #break
-            
-            #Method 1
-            (tengo, rhojo) = SHT21.measure(None,3,2)
-            print tengo, rhojo
-            
-#             (t0, rh0) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
-#             (t1, rh1) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
-#             print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
-            
-            #Method 2
-            #(temperature, humidity) = SHT21.measure(None)   # No I2C-Port/Driver --> GPIO2, GPIO3
-            #print("Temperature: %s   C  Humidity: %s %%" % (temperature, humidity))
-        
+            (t0, rh0) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
+            (t1, rh1) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
+            print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
+
             #time.sleep(0.3)	
 
         except:
