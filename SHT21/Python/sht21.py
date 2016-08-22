@@ -29,7 +29,7 @@ class sht21:
 # Temperature measurement function
     def read_temperature(self):
         self.i2c.write([0xF3])                                # Trigger T measurement (no hold master)
-        time.sleep(0.070)                                     # Waiting time, typ=66ms, max=85ms @ 14Bit resolution
+        time.sleep(0.066)                                     # Waiting time, typ=66ms, max=85ms @ 14Bit resolution
         data = self.i2c.read(3)
         if (self._check_crc(data, 2)):
             t = ((data[0] << 8) + data[1]) & 0xFFFC           # Set status bits to zero
@@ -76,19 +76,23 @@ if __name__ == "__main__":
         try:
 
             # End the process if you press any key + enter.
-            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-                line = raw_input()
-                break
+            #if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                #line = raw_input()
+                #break
             
             #Method 1
-            (t , rh) = SHT21.measure(None,3,2)
-            print t, rh
+            # (t , rh) = SHT21.measure(None,3,2)
+            # print t, rh
+            
+            (t0, rh0) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
+            (t1, rh1) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
+            print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
             
             #Method 2
             #(temperature, humidity) = SHT21.measure(None)   # No I2C-Port/Driver --> GPIO2, GPIO3
             #print("Temperature: %s   C  Humidity: %s %%" % (temperature, humidity))
         
-            time.sleep(0.3)	
+            #time.sleep(0.3)	
 
         except:
             print("sht21 I/O Error")
