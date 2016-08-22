@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''A Python class to access bmp180 based air pressure and temperature sensor.  The smbus module is
 required.
 
