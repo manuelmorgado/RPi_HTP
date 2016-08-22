@@ -63,7 +63,7 @@ class sht21:
     def read_humidity(self):
         """ RH measurement (no hold master), blocking for ~ 32ms !!! """
         self.i2c.write([0xF5])  # Trigger RH measurement (no hold master)
-        time.sleep(0.03)  # wait, typ=22ms, max=29ms @ 12Bit resolution
+        time.sleep(0.025)  # wait, typ=22ms, max=29ms @ 12Bit resolution
         data = self.i2c.read(3)
         if (self._check_crc(data, 2)):
             rh = ((data[0] << 8) + data[1]) & 0xFFFC  # zero the status bits
@@ -115,7 +115,9 @@ if __name__ == "__main__":
             ############################################################################################################
             # Example 3 Using multiple Sensors (without Driver), must be executed with sudo, Pullups required
             ############################################################################################################
-
+            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                line = raw_input()
+                break
             (t0, rh0) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
             (t1, rh1) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
             print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
