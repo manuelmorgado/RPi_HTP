@@ -81,12 +81,12 @@ if __name__ == "__main__":
                 #break
             
             #Method 1
-            # (t , rh) = SHT21.measure(None,3,2)
-            # print t, rh
+            (tengo, rhojo) = SHT21.measure(None,3,2)
+            print tengo, rhojo
             
-            (t0, rh0) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
-            (t1, rh1) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
-            print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
+#             (t0, rh0) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
+#             (t1, rh1) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
+#             print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
             
             #Method 2
             #(temperature, humidity) = SHT21.measure(None)   # No I2C-Port/Driver --> GPIO2, GPIO3
