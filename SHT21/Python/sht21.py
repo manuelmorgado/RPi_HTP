@@ -74,7 +74,6 @@ if __name__ == "__main__":
     SHT21 = sht21()
     while True:
         try:
-
             (t0, rh0) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
             (t1, rh1) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
             print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
@@ -83,4 +82,5 @@ if __name__ == "__main__":
 
         except:
             print("sht21 I/O Error")
+            break
         time.sleep(0.2)	 
