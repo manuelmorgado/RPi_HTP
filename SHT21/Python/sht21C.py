@@ -116,8 +116,8 @@ if __name__ == "__main__":
             # Example 3 Using multiple Sensors (without Driver), must be executed with sudo, Pullups required
             ############################################################################################################
 
-            (t0, rh0) = SHT21.measure(None,25,8)  # Use GPIOs SCL=3, SDA=2
-            (t1, rh1) = SHT21.measure(None,7,11)  # Use GPIOs SCL=3, SDA=2
+            (t0, rh0) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
+            (t1, rh1) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
             print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
 
             ############################################################################################################
