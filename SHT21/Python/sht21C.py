@@ -1,126 +1,235 @@
-#!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
+#!/usr/bin/env python
 
-#Importing Lybraries
+# Copyright 2014 IIJ Innovation Institute Inc. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY IIJ INNOVATION INSTITUTE INC. ``AS IS'' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL IIJ INNOVATION INSTITUTE INC. OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Copyright 2014 Keiichi Shima. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+'''A Python class to access BMP180 based air pressure sensor provided
+by Switch-Science as a part no. SFE-SEN-11824.  The smbus module is
+required.
+Example:
+import smbus
+import bmp180
+bus = smbus.SMBus(1)
+sensor = bmp180.Bmp180(bus)
+print sensor.pressure_and_temperature
+'''
+
+import sensorbase
+import struct
 import time
-import rpi_i2c
 
-#Creating the class sht21
-class sht21:
-    """Interface Class for sht21 Temperture and Humidity Sensor from www.sensirion.com
+# Default I2C address
+_DEFAULT_ADDRESS = 0x77
 
-    Hardware: Breakoutboard with sht21 Sensor for Raspberry Pi by www.emsystech.de
+# Registers
+_REG_AC1                 = 0xAA
+_REG_AC2                 = 0xAC
+_REG_AC3                 = 0xAE
+_REG_AC4                 = 0xB0
+_REG_AC5                 = 0xB2
+_REG_AC6                 = 0xB4
+_REG_B1                  = 0xB6
+_REG_B2                  = 0xB8
+_REG_MB                  = 0xBA
+_REG_MC                  = 0xBC
+_REG_MD                  = 0xBE
+_REG_CALIB_OFFSET        = _REG_AC1
+_REG_CONTROL_MEASUREMENT = 0xF4
+_REG_DATA                = 0xF6
 
-    The Class can be used in two ways.
-    1. With the build in I2C Port from Raspberry Pi using I2C Driver
-       I2C Driver must be enabled: https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio-setup/configuring-i2c
+# Commands
+_CMD_START_CONVERSION    = 0b00100000
+_CMD_TEMPERATURE         = 0b00001110
+_CMD_PRESSURE            = 0b00010100
 
-    2. rpi_i2c can emulate an I2C Bus on any GPIO Pin. This is more flexible and more than one sensor can be used.
-       But it needs Pullups für SCL and SDA und root for GPIO access. (sudo)
+# Oversampling mode
+OS_MODE_SINGLE = 0b00
+OS_MODE_2      = 0b01
+OS_MODE_4      = 0b10
+OS_MODE_8      = 0b11
 
-    The method "measure" does a complete cycle and returns a tupple with the values:
+# Conversion time (in second)
+_WAIT_TEMPERATURE = 0.0045
+_WAIT_PRESSURE    = [0.0045, 0.0075, 0.0135, 0.0255]
 
-    (temperature, humidity) = SHT21.measure(1)      # I2C-1 Port
+class Bmp180(sensorbase.SensorBase):
+    def __init__(self, bus = None, addr = _DEFAULT_ADDRESS,
+                 os_mode = OS_MODE_SINGLE):
+        assert(bus is not None)
+        assert(addr > 0b000111
+               and addr < 0b1111000)
 
-    If you want it more flexible e.g. multiple measurements, only humidity or temperature use:
+        super(Bmp180, self).__init__(
+            update_callback = self._update_sensor_data)
 
-    SHT21.open(1)
-    ...
-    temperature = SHT21.read_temperature()
-    humidity = SHT21.read_humidity()
-    ...
-    SHT21.close()
-    """
+        self._bus = bus
+        self._addr = addr
 
-    i2c = rpi_i2c.I2C()     # I2C Wrapper Class
-    
-    def measure(self, dev=1, scl=3, sda=2):
-        """Complete cycle including open, measurement und close, return tuple of temperature and humidity"""
-        self.open(dev, scl, sda)
-        t = self.read_temperature()
-        rh = self.read_humidity()
-        self.i2c.close()
-        return (t, rh)
+        self._ac0 = None
+        self._ac1 = None
+        self._ac2 = None
+        self._ac3 = None
+        self._ac4 = None
+        self._ac5 = None
+        self._ac6 = None
+        self._b1 = None
+        self._b2 = None
+        self._mb = None
+        self._mc = None
+        self._md = None
+        self._os_mode = os_mode
+        self._pressure = None
+        self._temperature = None
 
-    def open(self, dev=1, scl=3, sda=2):
-        """Hardware I2C Port, B,B+,Pi 2 = 1 the first Pi = 0"""
-        self.i2c.open(0x40,dev, scl, sda)
-        self.i2c.write([0xFE])  # execute Softreset Command  (default T=14Bit RH=12)
-        time.sleep(0.050)
+        self._read_calibration_data()
 
-    def read_temperature(self):
-        """ Temperature measurement (no hold master), blocking for ~ 88ms !!! """
-        self.i2c.write([0xF3])
-        time.sleep(0.066)  # wait, typ=66ms, max=85ms @ 14Bit resolution
-        data = self.i2c.read(3)
-        if (self._check_crc(data, 2)):
-            t = ((data[0] << 8) + data[1]) & 0xFFFC  # set status bits to zero
-            t = -46.82 + ((t * 175.72) / 65536)  # T = 46.82 + (175.72 * ST/2^16 )
-            return round(t, 1)
+    @property
+    def pressure(self):
+        '''Returns a pressure value.  Returns None if no valid value is set
+        yet.
+        '''
+        self._update()
+        return (self._pressure)
+
+    @property
+    def temperature(self):
+        '''Returns a temperature value.  Returns None if no valid value is
+        set yet.
+        '''
+        self._update()
+        return (self._temperature)
+
+    @property
+    def pressure_and_temperature(self):
+        '''Returns pressure and temperature values as a tuple.  This call can
+        save 1 transaction than getting a pressure and temperature
+        values separetely.  Returns (None, None) if no valid values
+        are set yet.
+        '''
+        self._update()
+        return (self._pressure, self._temperature)
+
+    @property
+    def os_mode(self):
+        '''Gets/Sets oversampling mode.
+        OS_MODE_SINGLE: Single mode.
+        OS_MODE_2: 2 times.
+        OS_MODE_4: 4 times.
+        OS_MODE_8: 8 times.
+        '''
+        return (self._os_mode)
+
+    @os_mode.setter
+    def os_mode(self, os_mode):
+        assert(os_mode == OS_MODE_SINGLE
+               or os_mode == OS_MODE_2
+               or os_mode == OS_MODE_4
+               or os_mode == OS_MODE_8)
+        self._os_mode = os_mode
+
+    def _read_calibration_data(self):
+        calib = self._bus.read_i2c_block_data(self._addr,
+                                              _REG_CALIB_OFFSET, 22)
+        (self._ac1, self._ac2, self._ac3, self._ac4,
+         self._ac5, self._ac6, self._b1, self._b2,
+         self._mb, self._mc, self._md) = struct.unpack(
+             '>hhhHHHhhhhh', ''.join([chr(x) for x in calib]))
+
+    def _update_sensor_data(self):
+        cmd = _CMD_START_CONVERSION | _CMD_TEMPERATURE
+        self._bus.write_byte_data(self._addr,
+                                  _REG_CONTROL_MEASUREMENT, cmd)
+        time.sleep(_WAIT_TEMPERATURE)
+        vals = self._bus.read_i2c_block_data(self._addr,
+                                             _REG_DATA, 2)
+        ut = vals[0] << 8 | vals[1]
+
+        cmd = _CMD_START_CONVERSION | self._os_mode << 6 | _CMD_PRESSURE
+        self._bus.write_byte_data(self._addr,
+                                  _REG_CONTROL_MEASUREMENT, cmd)
+        time.sleep(_WAIT_PRESSURE[self._os_mode])
+        vals = self._bus.read_i2c_block_data(self._addr,
+                                             _REG_DATA, 3)
+        up = (vals[0] << 16 | vals[1] << 8 | vals[0]) >> (8 - self._os_mode)
+
+        x1 = ((ut - self._ac6) * self._ac5) >> 15
+        x2 = (self._mc << 11) / (x1 + self._md)
+        b5 = x1 + x2
+        self._temperature = ((b5 + 8) / 2**4) / 10.0
+
+        b6 = b5 - 4000
+        x1 = self._b2 * ((b6 * b6) >> 12)
+        x2 = self._ac2 * b6
+        x3 = (x1 + x2) >> 11
+        b3 = (((self._ac1 *4 + x3) << self._os_mode) + 2) >> 2
+        x1 = (self._ac3 * b6) >> 13
+        x2 = (self._b1 * (b6 * b6) >> 12) >> 16
+        x3 = ((x1 + x2) + 2) >> 2
+        b4 = (self._ac4 * (x3 + 32768)) >> 15
+        b7 = (up - b3) * (50000 >> self._os_mode)
+        if (b7 < 0x80000000):
+            p = (b7 * 2) / b4
         else:
-            return None
+            p = (b7 / b4) * 2
+        x1 = p**2 >> 16
+        x1 = (x1 * 3038) >> 16
+        x2 = (-7357 * p) >> 16
+        self._pressure = (p + ((x1 + x2 + 3791) >> 4)) / 100.0
 
-    def read_humidity(self):
-        """ RH measurement (no hold master), blocking for ~ 32ms !!! """
-        self.i2c.write([0xF5])  # Trigger RH measurement (no hold master)
-        time.sleep(0.025)  # wait, typ=22ms, max=29ms @ 12Bit resolution
-        data = self.i2c.read(3)
-        if (self._check_crc(data, 2)):
-            rh = ((data[0] << 8) + data[1]) & 0xFFFC  # zero the status bits
-            rh = -6 + ((125 * rh) / 65536)
-            if (rh > 100): rh = 100
-            return round(rh, 1)
-        else:
-            return None
+if __name__ == '__main__':
+    import smbus
 
-    def close(self):
-        """Closes the i2c connection"""
-        self.i2c.close()
-
-    def _check_crc(self, data, length):
-        """Calculates checksum for n bytes of data and compares it with expected"""
-        crc = 0
-        for i in range(length):
-            crc ^= (ord(chr(data[i])))
-            for bit in range(8, 0, -1):
-                if crc & 0x80:
-                    crc = (crc << 1) ^ 0x131  # CRC POLYNOMIAL
-                else:
-                    crc = (crc << 1)
-        return True if (crc == data[length]) else False
-
-#while True:
-	#sensor = sht21()
-	#sensor.open()
-	#temp = sensor.measure
-	#print temp
-if __name__ == "__main__":
-    SHT21 = sht21()
-    while True:
-        try:
-            ############################################################################################################
-            # Example 1 Using the I2C Driver
-            ############################################################################################################
-
-            #(temperature, humidity) = SHT21.measure(1)      # I2C-1 Port
-            #print("Temperature: %s °C  Humidity: %s %%" % (temperature, humidity))
-
-            ############################################################################################################
-            # Example 2 Using GPIOs on I2C Pins (without Driver), must be executed with sudo
-            ############################################################################################################
-
-            #(temperature, humidity) = SHT21.measure(None)   # No I2C-Port/Driver --> GPIO2, GPIO3
-            #print("Temperature: %s °C  Humidity: %s %%" % (temperature, humidity))
-
-            ############################################################################################################
-            # Example 3 Using multiple Sensors (without Driver), must be executed with sudo, Pullups required
-            ############################################################################################################
-
-            (t0, rh0) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
-            (t1, rh1) = SHT21.measure(None,3,2)  # Use GPIOs SCL=3, SDA=2
-            print("%s°C\t%s%%\t%s°C\t%s%%" % (t0,rh0,t1,rh1))
-
-            ############################################################################################################
-        except:
-            print("sht21 I/O Error")
-        time.sleep(0.2)
+    bus = smbus.SMBus(1)
+    sensor = Bmp180(bus)
+    for cache in [0, 5]:
+        print '**********'
+        print 'Cache lifetime is %d' % cache
+        sensor.cache_lifetime = cache
+        for mode in [OS_MODE_SINGLE, OS_MODE_2, OS_MODE_4, OS_MODE_8]:
+            sensor.os_mode = mode
+            print 'Oversampling mode is %d' % mode
+            for c in range(10):
+                print sensor.pressure_and_temperature
