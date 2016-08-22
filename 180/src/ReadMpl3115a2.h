@@ -1,4 +1,0 @@
-#ifndef READMPL3115A2_H_INCLUDED
-#define READMPL3115A2_H_INCLUDED
-void ReadMpl3115a2();
-#endif

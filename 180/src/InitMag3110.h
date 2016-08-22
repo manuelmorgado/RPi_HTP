@@ -1,5 +1,0 @@
-#ifndef INITMAG3110_H_INCLUDED
-#define INITMAG3110_H_INCLUDED
-int InitMag3110();
-#endif
-
