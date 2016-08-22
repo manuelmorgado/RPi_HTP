@@ -29,7 +29,7 @@ class sht21:
 # Temperature measurement function
     def read_temperature(self):
         self.i2c.write([0xF3])                                # Trigger T measurement (no hold master)
-        time.sleep(0.06)                                     # Waiting time, typ=66ms, max=85ms @ 14Bit resolution
+        time.sleep(0.070)                                     # Waiting time, typ=66ms, max=85ms @ 14Bit resolution
         data = self.i2c.read(3)
         if (self._check_crc(data, 2)):
             t = ((data[0] << 8) + data[1]) & 0xFFFC           # Set status bits to zero
@@ -41,7 +41,7 @@ class sht21:
 # Humidity measurement function
     def read_humidity(self):
         self.i2c.write([0xF5])                                # Trigger RH measurement (no hold master)
-        time.sleep(0.03)                                      # Waiting time, typ=22ms, max=29ms @ 12Bit resolution
+        time.sleep(0.25)                                      # Waiting time, typ=22ms, max=29ms @ 12Bit resolution
         data = self.i2c.read(3)
         if (self._check_crc(data, 2)):
             rh = ((data[0] << 8) + data[1]) & 0xFFFC          # Set status bits to zero
