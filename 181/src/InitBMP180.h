@@ -1,5 +1,0 @@
-#ifndef INITBMP180_H_INCLUDED
-#define INITBMP180_H_INCLUDED
-int InitBMP180();
-#endif
-
