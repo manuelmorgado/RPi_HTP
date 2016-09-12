@@ -11,10 +11,6 @@
 #define	ERROR_SHT21_CRC_TEMP		2
 #define	ERROR_SHT21_CRC_HUMIDITY	4
 
-//=== Type definitions (typedef) ===================================================================
-
-//=== Global constants (extern) ====================================================================
-
 //=== Global variables (extern) ====================================================================
 
 uint8	Sht21Error;
