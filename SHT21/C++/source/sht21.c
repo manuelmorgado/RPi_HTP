@@ -7,21 +7,14 @@
 
 
 uint8	Sht21Error;
-
-//=== Local constants  =============================================================================
-
-//=== Local variables ==============================================================================
-
-//=== Local function prototypes ====================================================================
-
 uint8 CalcSht21Crc(uint8 *data,uint8 nbrOfBytes);
 
 //--------------------------------------------------------------------------------------------------
 // Name:      SHT21_Read
-// Function:  
+// Function:  Read sensor
 //            
-// Parameter: 
-// Return:    
+// Parameter: -
+// Return:    -
 //--------------------------------------------------------------------------------------------------
 uint8 SHT21_Read(int16 *temperature,uint8 *humidity)
 {
@@ -48,14 +41,6 @@ uint8 SHT21_Read(int16 *temperature,uint8 *humidity)
 		val += buf[1];
 		val &= 0xFFFC;
   		  		
-		//	T = -46,85 + 175,72 * St/65535      da 1/10K -->  * 10
-		//	T = -468,5 + 1757,2 * St/65535		verinfachen
-		//	T = -468,5 + St / 37,2956..			damit Konstante ganzzahlig wird mit 2 erweitern
-		//  T = -937 + 2*St / 37,2956..			Bruch für Division mit 256 erweitern  
-		//	T = (-937 +  (St * 512) / (37,2956.. * 256)  )  / 2
-		//	T = (((St * 512) / 9548) - 937) / 2
-  	  		
-		//	val = (((val * 512) / 9548) - 937) / 2;
 		*temperature = ((val * 512) / 9548);
 		*temperature = ((*temperature) - 937) / 2;       
 	}
@@ -76,10 +61,6 @@ uint8 SHT21_Read(int16 *temperature,uint8 *humidity)
   		val <<= 8;
   		val += buf[1];
   		val &= 0xFFFC;
-  		  			
-  		//   T = -6 + 125* Srh/65535      
-  		//	 T = -6 + Srh / 524,28
-  		//   T = -6 + (Srh * 256) / 134215      |  *256	 wegen Numerik erweitern
   	  		  		
   		val = ((val * 256) / 134215) - 6;
   		*humidity = val;
@@ -97,11 +78,11 @@ uint8 SHT21_Read(int16 *temperature,uint8 *humidity)
 }
 
 //------------------------------------------------------------------------------
-// Name:      
-// Function:  
+// Name:  Checksum
+// Function:  Return value when sensor is read it good
 //            
-// Parameter: 
-// Return:    
+// Parameter: -
+// Return:    Value or None 
 //------------------------------------------------------------------------------
 uint8 CalcSht21Crc(uint8 *data,uint8 nbrOfBytes)
 {
