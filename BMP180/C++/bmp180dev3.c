@@ -251,6 +251,7 @@ int bmp_GetTemperature(int fd, double *Temp)
   uint8_t rValues[2];
   
   if (bmp_WriteCmd(fd, BMPx8x_TempConversion)!=0) return -1;
+  
   //Code is now 'turbo' overclock independent 
   sleepms (BMPx8x_minDelay);
   if (WaitForConversion(fd) !=0 ) return -1;  
@@ -269,18 +270,18 @@ int bmp_GetTemperature(int fd, double *Temp)
 }
 
 double bmp_altitude(double p){
-  return 145437.86*(1- pow((p/1013.25),0.190294496)); //return feet
-  //return 44330*(1- pow((p/1013.25),0.190294496)); //return meters
+  return 145437.86*(1- pow((p/1013.25),0.190294496));          //return feet
+  //return 44330*(1- pow((p/1013.25),0.190294496));            //return meters
 }
 
 double bmp_qnh(double p,double StationAlt){
-  return p / pow((1-(StationAlt/145437.86)),5.255) ; //return hPa based on feet
-  //return p / pow((1-(StationAlt/44330)),5.255) ; //return hPa based on feet
+  return p / pow((1-(StationAlt/145437.86)),5.255) ;          //return hPa based on feet
+  //return p / pow((1-(StationAlt/44330)),5.255) ;            //return hPa based on feet
 }
 
 double ppl_DensityAlt(double PAlt,double Temp){
   double ISA = 15 - (1.98*(PAlt/1000));
-  return PAlt+(120*(Temp-ISA)); //So,So density altitude
+  return PAlt+(120*(Temp-ISA));                              //So,So density altitude
 }
 
 int main(int argc, char **argv)
