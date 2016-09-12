@@ -25,7 +25,6 @@ int main(int argc, char **argv)
 		
 	if(!Mode) 
 	{
-		printf("Raspi-SHT21 V3.0.0 by Martin Steppuhn (www.emsystech.de) [" __DATE__ " " __TIME__"]\n");
 		printf("Options:\n");
 		printf("   S : [20.0 99]\n");	
 		printf("   L : [temperature=20.0][humidity=99]\n");	
