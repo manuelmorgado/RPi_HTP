@@ -1,36 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-#Importing Lybraries
+#Importing Libraries
 import time
 import rpi_i2c
 
 #Creating the class sht21
 class sht21:
-    """Interface Class for sht21 Temperture and Humidity Sensor from www.sensirion.com
-
-    Hardware: Breakoutboard with sht21 Sensor for Raspberry Pi by www.emsystech.de
-
-    The Class can be used in two ways.
-    1. With the build in I2C Port from Raspberry Pi using I2C Driver
-       I2C Driver must be enabled: https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio-setup/configuring-i2c
-
-    2. rpi_i2c can emulate an I2C Bus on any GPIO Pin. This is more flexible and more than one sensor can be used.
-       But it needs Pullups für SCL and SDA und root for GPIO access. (sudo)
-
-    The method "measure" does a complete cycle and returns a tupple with the values:
-
-    (temperature, humidity) = SHT21.measure(1)      # I2C-1 Port
-
-    If you want it more flexible e.g. multiple measurements, only humidity or temperature use:
-
-    SHT21.open(1)
-    ...
-    temperature = SHT21.read_temperature()
-    humidity = SHT21.read_humidity()
-    ...
-    SHT21.close()
-    """
 
     i2c = rpi_i2c.I2C()     # I2C Wrapper Class
     
